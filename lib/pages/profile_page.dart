@@ -12,7 +12,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String name = 'Ilan Ewos';
   String email = 'user@email.com';
-  String password = '********';
+  String password = '';
   String phone = '0812-3456-7890';
   String? photoPath;
 
@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       name = prefs.getString('name') ?? name;
       email = prefs.getString('email') ?? email;
-      password = prefs.getString('password') != null ? '********' : password;
+      password = prefs.getString('password') != null ? '' : password;
       phone = prefs.getString('phone') ?? phone;
       photoPath = prefs.getString('photo');
     });
@@ -88,14 +88,13 @@ class _ProfilePageState extends State<ProfilePage> {
               const Divider(),
               infoTile(Icons.lock, 'Password', '********', primaryColor),
               const Divider(),
-              infoTile(Icons.phone, 'No. HP', phone, primaryColor),
-              const Divider(),
               const SizedBox(height: 40),
               Center(
                 child: ElevatedButton.icon(
-                  onPressed: () async {
-                    await Navigator.pushNamed(context, '/edit-profile');
-                    await _loadProfileData();
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/edit-profile').then((_) {
+                      _loadProfileData(); // refresh setelah kembali dari edit
+                    });
                   },
                   icon: const Icon(Icons.edit),
                   label: const Text('Edit'),

@@ -6,12 +6,12 @@ class NotifikasiPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> notifikasiList = [
-      {'judul': 'Waktunya minum Paracetamol', 'waktu': '13 Juni 2025 - 08:00'},
+      {'judul': 'Waktunya minum Paracetamol', 'waktu': '18 Juni 2025 - 08:00'},
       {
         'judul': 'Minum Amoxicillin setelah makan',
-        'waktu': '13 Juni 2025 - 12:00'
+        'waktu': '18 Juni 2025 - 12:00'
       },
-      {'judul': 'Jangan lupa minum Vitamin C', 'waktu': '13 Juni 2025 - 18:00'},
+      {'judul': 'Jangan lupa minum Vitamin C', 'waktu': '18 Juni 2025 - 18:00'},
     ];
 
     return Scaffold(

@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
         '/tambah-obat': (context) => const TambahObatPage(),
         '/riwayat-obat': (context) => const RiwayatObatPage(),
         '/profile': (context) => const ProfilePage(),
-        // '/notifications': (context) => const NotifikasiPage(),
+        '/notifications': (context) => const NotifikasiPage(),
         '/edit-profile': (context) => const EditProfilePage(),
         '/tentang-aplikasi': (context) => TentangAplikasiPage(),
       },

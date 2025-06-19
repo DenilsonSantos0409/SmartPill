@@ -9,6 +9,10 @@ import 'tambah_obat.dart';
 import 'riwayat_obat.dart';
 import '../providers/obat_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/browser.dart';
+import 'package:timezone/data/latest_all.dart';
+import 'package:timezone/timezone.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,12 +27,53 @@ class _HomePageState extends State<HomePage> {
   DateTime _selectedDay = DateTime.now();
   late List<DateTime> next30Days;
 
-  @override
-  void initState() {
-    super.initState();
-    next30Days = _getDatesFromYesterday();
-    _loadObatData();
+
+  final FlutterLocalNotificationsPlugin notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+
+ @override
+void initState() {
+  super.initState();
+  next30Days = _getDatesFromYesterday();
+  _loadObatData();
+  _loadUserName(); // Tambahkan ini di akhir
+}
+
+  Future<void> init() async {
+    initializeTimeZones();
+
+    //! https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    setLocalLocation(
+      getLocation('America/Toronto'),
+    );
+
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
+    const DarwinInitializationSettings iosSettings =
+        DarwinInitializationSettings();
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+
+    await notificationsPlugin.initialize(initializationSettings);
+
+    await notificationsPlugin
+      .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+      ?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
   }
+
+
+
+
+
 
   Future<void> _loadObatData() async {
     final obatProvider = Provider.of<ObatProvider>(context, listen: false);
@@ -61,7 +106,16 @@ class _HomePageState extends State<HomePage> {
     DateTime yesterday = DateTime.now().subtract(Duration(days: 1));
     return List.generate(30, (index) => yesterday.add(Duration(days: index)));
   }
+  
+  String _userName = 'Memuat nama...';
 
+@override
+Future<void> _loadUserName() async {
+  final prefs = await SharedPreferences.getInstance();
+  setState(() {
+    _userName = prefs.getString('name') ?? 'Ilan Ewos';
+  });
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,10 +132,10 @@ class _HomePageState extends State<HomePage> {
                           ? const Color.fromARGB(255, 1, 37, 72)
                           : Colors.lightBlueAccent,
                     ),
-                    accountName: const Text('Ilan Ewos'),
+                    accountName: Text(_userName),
                     accountEmail: null,
                     currentAccountPicture: const CircleAvatar(
-                      backgroundImage: AssetImage('assets/test_foto .png'),
+                      backgroundImage: AssetImage('assets/test_foto.png'),
                     ),
                   ),
                   Positioned(
@@ -102,13 +156,15 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               ListTile(
-                leading: const Icon(Icons.person),
-                title: const Text('Profile Saya'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/profile');
-                },
-              ),
+  leading: const Icon(Icons.person),
+  title: const Text('Profile Saya'),
+  onTap: () {
+    Navigator.pop(context);
+    Navigator.pushNamed(context, '/profile').then((_) {
+      _loadUserName(); // <- Tambahkan ini
+    });
+  },
+),
               ListTile(
                 leading: const Icon(Icons.info_outline),
                 title: const Text('Tentang Aplikasi'),
